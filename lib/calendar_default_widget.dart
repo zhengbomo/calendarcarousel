@@ -74,7 +74,7 @@ class CalendarDefaultHeader extends StatelessWidget {
             icon: Icon(Icons.chevron_left),
             onPressed: () {
               calendarController.previousPage(
-                duration: Duration(milliseconds: 250), 
+                duration: Duration(milliseconds: 450), 
                 curve: Curves.easeInOut
               );
             },
@@ -86,7 +86,7 @@ class CalendarDefaultHeader extends StatelessWidget {
             icon: Icon(Icons.chevron_right),
             onPressed: () {
               calendarController.nextPage(
-                duration: Duration(milliseconds: 250), 
+                duration: Duration(milliseconds: 450), 
                 curve: Curves.easeInOut
               );
             },

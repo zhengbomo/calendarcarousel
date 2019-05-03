@@ -143,13 +143,12 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
   Widget _createMonthView(int year, int month) {
     var firstWeekDay = DateTime(year, month, 1).weekday % 7;
-    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
     
     var thisMonthDayCount = DateTime(year, month + 1, 0).day;
+    var lastMonthDayCount = DateTime(year, month, 0).day;
     /// 行数
-    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
-
-    print("$month, $firstWeekDay, $lastMonthDayCount, $thisMonthDayCount, $rowCount");
+    var rowCount = ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
 
     return Container(
       width: double.infinity,
@@ -158,7 +157,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
         crossAxisCount: 7,
         childAspectRatio: 1,
         children: List.generate(rowCount * 7, (index) {
-          var currentDay = index + 1 - lastMonthDayCount;
+          var currentDay = index + 1 - lastMonthRestDayCount;
           // last month day
           var isLastMonthDay = false;
           // next month day
