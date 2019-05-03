@@ -55,29 +55,27 @@ class CalendarCarousel extends StatefulWidget {
 class _CalendarCarouselState extends State<CalendarCarousel> with TickerProviderStateMixin  {
   PageController _pageController;
 
+  // aspectRatio for monthView
   double _aspectRatio = 1;
-
   int _currentIndex = 0;
   
   @override
   void initState() {
-    var now = DateTime.now();
-    var currentDate = DateTime(widget.year, widget.month, 10);
-    var monthSpan = (currentDate.year - now.year) * 12 + (currentDate.month - now.month);
-    _currentIndex = _kTodayIndex + monthSpan;
+    _currentIndex = widget.controller._getIndexOfDate(widget.year, widget.month);
 
     _pageController = PageController(
       viewportFraction: 1,
       initialPage: _currentIndex,
       keepPage: false,
     );
-
-    var date = this._getActualDate(_currentIndex);
-    var firstWeekDay = DateTime(date.year, date.month, 1).weekday % 7;
-    var thisMonthDayCount = DateTime(date.year, date.month + 1, 0).day;
+    
+    // last month day count 
+    var firstWeekDay = DateTime(widget.year, widget.month, 1).weekday % 7;
+    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    var thisMonthDayCount = DateTime(widget.year, widget.month + 1, 0).day;
 
     /// 行数
-    var rowCount = ((thisMonthDayCount + firstWeekDay) / 7.0).ceil();
+    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
     setState(() {
       _aspectRatio = 7.0 / rowCount; 
     });
@@ -105,10 +103,14 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   _pageChanged(int index) {
     var date = this._getActualDate(index);
     var firstWeekDay = DateTime(date.year, date.month, 1).weekday % 7;
+    
+    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    print("$firstWeekDay, $lastMonthDayCount");
+
     var thisMonthDayCount = DateTime(date.year, date.month + 1, 0).day;
 
     /// 行数
-    var rowCount = ((thisMonthDayCount + firstWeekDay) / 7.0).ceil();
+    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
     setState(() {
       _aspectRatio = 7.0 / rowCount; 
     });
@@ -117,7 +119,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   }
 
   Widget _createWeekView() {
-    return CalendarWeekday(0, builder: (weekday) {
+    return CalendarWeekday(widget.firstDayOfWeek, builder: (weekday) {
       return widget.weekdayWidgetBuilder(weekday);
     });
   }
@@ -132,20 +134,23 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
         controller: _pageController,
         itemBuilder:(BuildContext context,int index) {
           var date = this._getActualDate(index);
-          return createMonthView(date.year, date.month);
+          return _createMonthView(date.year, date.month);
         },
         scrollDirection: Axis.horizontal,
       )
     );
   }
 
-  Widget createMonthView(int year, int month) {
+  Widget _createMonthView(int year, int month) {
     var firstWeekDay = DateTime(year, month, 1).weekday % 7;
-    var lastMonthDayCount = DateTime(year, month, 0).day;
+    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    
     var thisMonthDayCount = DateTime(year, month + 1, 0).day;
-
     /// 行数
-    var rowCount = ((thisMonthDayCount + firstWeekDay) / 7.0).ceil();
+    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
+
+    print("$month, $firstWeekDay, $lastMonthDayCount, $thisMonthDayCount, $rowCount");
+
     return Container(
       width: double.infinity,
       child: GridView.count(
@@ -153,7 +158,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
         crossAxisCount: 7,
         childAspectRatio: 1,
         children: List.generate(rowCount * 7, (index) {
-          var currentDay = index + 1 - firstWeekDay;
+          var currentDay = index + 1 - lastMonthDayCount;
           // last month day
           var isLastMonthDay = false;
           // next month day
@@ -193,9 +198,9 @@ class CalendarController extends ChangeNotifier {
     notifyListeners();
   }
 
-  ValueNotifier<bool> canListenLoading = ValueNotifier(false);
-
-
+  /// scroll to next month
+  /// 
+  /// it will do animate while duration is not null 
   nextPage({ 
     Duration duration,
     Curve curve = Curves.bounceInOut 
@@ -210,6 +215,9 @@ class CalendarController extends ChangeNotifier {
     }    
   }
 
+  /// scroll to previous month
+  /// 
+  /// it will do animate while duration is not null 
   previousPage({
     Duration duration,
     Curve curve = Curves.bounceInOut 
@@ -224,6 +232,9 @@ class CalendarController extends ChangeNotifier {
     }    
   }
 
+  /// scroll to now
+  /// 
+  /// it will do animate while duration is not null 
   goToToday({
     Duration duration,
     Curve curve = Curves.bounceInOut 
@@ -232,6 +243,9 @@ class CalendarController extends ChangeNotifier {
     goToMonth(year: now.year, month: now.month, duration: duration, curve: curve);
   }
 
+  /// scroll to special month
+  /// 
+  /// it will do animate while duration is not null 
   goToMonth({
     @required int year, 
     @required int month,
@@ -250,20 +264,10 @@ class CalendarController extends ChangeNotifier {
     }
   }
 
-  DateTime getCurrentMonth() {
-    return currentDate;
-    // var index = _pageController.page.toInt();
-    // var monthSpan = index - _kTodayIndex;
-    // var now = DateTime.now();
-    // return DateTime(now.year, now.month + monthSpan);
-  }
-
-  // get page index of month
+  /// get page index of month
   int _getIndexOfDate(int year, int month) {
     var now = DateTime.now();
     var monthSpan = (year - now.year) * 12 + (month - now.month);
     return _kTodayIndex + monthSpan;
   }
-
-  
 }
