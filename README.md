@@ -46,6 +46,14 @@ CalendarCarousel(
   dateFormat: dateFormat,
   year: 2019,
   month: 5,
+  headerWidgetBuilder: (controller, dateFormat, dateTime) {
+    // customize header
+    return CalendarDefaultHeader(
+      calendarController: controller, 
+      dateTime: dateTime,
+      dateFormat: dateFormat,
+    );
+  },
   weekdayWidgetBuilder: (weekday) {
     // customize the weekday header widget, the sunday for weekday is 7
     return CalendarDefaultWeekday(
@@ -56,7 +64,7 @@ CalendarCarousel(
         color: Colors.red
       )
     );
-  },
+  },  
   dayWidgetBuilder: (date, isLastMonthDay, isNextMontyDay) {
     // customize the day widget in month widget
     var today = DateTime.now();

@@ -9,6 +9,7 @@ const _kTodayIndex = _IntegerHalfMax;
 
 typedef Widget DayWidgetBuilder(DateTime date, bool isLastMonthDay, bool isNextMonthDay);
 typedef Widget WeekdayWidgetBuilder(int weekday);
+typedef Widget CalendarHeaderWidgetBuilder(CalendarController controller, DateFormat dateFormat, DateTime dateTime);
 
 class CalendarCarousel extends StatefulWidget {
   final int year;
@@ -17,6 +18,7 @@ class CalendarCarousel extends StatefulWidget {
   final DateFormat dateFormat;
   final CalendarController controller;
   
+  final CalendarHeaderWidgetBuilder headerWidgetBuilder;
   final DayWidgetBuilder dayWidgetBuilder;
   final WeekdayWidgetBuilder weekdayWidgetBuilder;
 
@@ -25,6 +27,7 @@ class CalendarCarousel extends StatefulWidget {
     int year,
     int month,
     int firstDayOfWeek,
+    CalendarHeaderWidgetBuilder headerWidgetBuilder,
     DayWidgetBuilder dayWidgetBuilder, 
     WeekdayWidgetBuilder weekdayWidgetBuilder,
     CalendarController controller,
@@ -34,6 +37,14 @@ class CalendarCarousel extends StatefulWidget {
     this.year = year ?? DateTime.now().year,
     this.month = month ?? DateTime.now().month,
     this.controller = controller ?? CalendarController(),
+    this.headerWidgetBuilder = headerWidgetBuilder ?? 
+      ((controller, dateFormat, dateTime) {
+        return CalendarDefaultHeader(
+          calendarController: controller, 
+          dateTime: dateTime,
+          dateFormat: dateFormat,
+        );
+      }),
     this.dayWidgetBuilder = dayWidgetBuilder ?? 
       ((DateTime date, bool isLastMonthDay, bool isNextMonthDay) {
         return CalendarDefaultDay(
@@ -68,14 +79,8 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
       initialPage: _currentIndex,
       keepPage: false,
     );
-    
-    // last month day count 
-    var firstWeekDay = DateTime(widget.year, widget.month, 1).weekday % 7;
-    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
-    var thisMonthDayCount = DateTime(widget.year, widget.month + 1, 0).day;
 
-    /// 行数
-    var rowCount = ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
+    var rowCount = _getRowCount(widget.year, widget.month);
     _aspectRatio = 7.0 / rowCount; 
     
     widget.controller._pageController = _pageController;
@@ -86,11 +91,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        CalendarDefaultHeader(
-          calendarController: widget.controller, 
-          dateTime: _getActualDate(_currentIndex),
-          dateFormat: widget.dateFormat,
-        ),
+        _createHeaderView(),
         _createWeekView(),
         _createPageView()
       ],
@@ -99,18 +100,25 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
   _pageChanged(int index) {
     var date = this._getActualDate(index);
-    var firstWeekDay = DateTime(date.year, date.month, 1).weekday % 7;
-
-    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
-    var thisMonthDayCount = DateTime(date.year, date.month + 1, 0).day;
-
-    /// 行数
-    var rowCount = ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
+    var rowCount = _getRowCount(date.year, date.month);
     setState(() {
       _aspectRatio = 7.0 / rowCount; 
     });
     _currentIndex = index;
     widget.controller._setCurrentDate(date);
+  }
+
+  int _getRowCount(int year, int month) {
+    var firstWeekDay = DateTime(year, month, 1).weekday % 7;
+
+    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    var thisMonthDayCount = DateTime(year, month + 1, 0).day;
+
+    return ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
+  }
+
+  Widget _createHeaderView() {
+    return widget.headerWidgetBuilder(widget.controller, widget.dateFormat, _getActualDate(_currentIndex));
   }
 
   Widget _createWeekView() {

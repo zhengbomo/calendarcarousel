@@ -80,7 +80,7 @@ class CalendarDefaultHeader extends StatelessWidget {
             },
           ),
           Expanded(
-            child: Text("${dateFormat.format(dateTime)}", style: TextStyle(fontSize: 20), textAlign: TextAlign.center,),
+            child: Text("${dateFormat.format(dateTime)}", style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
           ),
           IconButton(
             icon: Icon(Icons.chevron_right),

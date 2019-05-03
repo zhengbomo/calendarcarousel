@@ -50,6 +50,13 @@ class _MyAppState extends State<MyApp> {
               dateFormat: dateFormat,
               year: initYear,
               month: initMonth,
+              headerWidgetBuilder: (controller, dateFormat, dateTime) {
+                return CalendarDefaultHeader(
+                  calendarController: controller, 
+                  dateTime: dateTime,
+                  dateFormat: dateFormat,
+                );
+              },
               weekdayWidgetBuilder: (weekday) {
                 return CalendarDefaultWeekday(weekday: weekday, dateFormat: dateFormat, textStyle: TextStyle(
                   fontSize: 16,
