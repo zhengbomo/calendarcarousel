@@ -1,20 +1,27 @@
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/material.dart';
+import './calendar_carousel.dart' show CalendarController;
  
-var _dateFormat = DateFormat.yMMM("en");
-
 class CalendarDefaultWeekday extends StatelessWidget {
   final int weekday;
-  CalendarDefaultWeekday({this.weekday});
+  final DateFormat dateFormat;
+  final TextStyle textStyle;
+  CalendarDefaultWeekday({
+    this.weekday,
+    this.dateFormat,
+    this.textStyle
+  });
 
   @override
   Widget build(BuildContext context) {
     var werapWeekday = weekday % 7;
-    var msg = _dateFormat.dateSymbols.STANDALONESHORTWEEKDAYS[werapWeekday]; 
-    return Container(
-      padding: EdgeInsets.all(12),
-      child: Center(
-        child: Text("$msg", textAlign: TextAlign.center,),
+    var msg = dateFormat.dateSymbols.STANDALONESHORTWEEKDAYS[werapWeekday]; 
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.all(3),
+        child: Center(
+          child: Text("$msg", textAlign: TextAlign.center, style: this.textStyle),
+        ),
       )
     );
   }
@@ -46,9 +53,14 @@ class CalendarDefaultDay extends StatelessWidget {
 }
 
 class CalendarDefaultHeader extends StatelessWidget {
-  final PageController pageController;
+  final CalendarController calendarController;
   final DateTime dateTime;
-  CalendarDefaultHeader({this.pageController, this.dateTime});
+  final DateFormat dateFormat;
+  CalendarDefaultHeader({
+    @required this.calendarController, 
+    @required this.dateTime,
+    @required this.dateFormat
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,22 +70,22 @@ class CalendarDefaultHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Expanded(
-            child: Text("${_dateFormat.format(dateTime)}", style: TextStyle(fontSize: 20)),
-          ),
-          FlatButton(
-            child: Text("Prev"),
+          IconButton(
+            icon: Icon(Icons.chevron_left),
             onPressed: () {
-              pageController.previousPage(
+              calendarController.previousPage(
                 duration: Duration(milliseconds: 250), 
                 curve: Curves.easeInOut
               );
             },
           ),
-          FlatButton(
-            child: Text("Next"),
+          Expanded(
+            child: Text("${dateFormat.format(dateTime)}", style: TextStyle(fontSize: 20), textAlign: TextAlign.center,),
+          ),
+          IconButton(
+            icon: Icon(Icons.chevron_right),
             onPressed: () {
-              pageController.nextPage(
+              calendarController.nextPage(
                 duration: Duration(milliseconds: 250), 
                 curve: Curves.easeInOut
               );

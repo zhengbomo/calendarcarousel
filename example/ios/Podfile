@@ -52,14 +52,6 @@ target 'Runner' do
       pod 'Flutter', :path => File.join(symlink, File.basename(p[:path]))
     end
   }
-
-  # Plugin Pods
-  plugin_pods = parse_KV_file('../.flutter-plugins')
-  plugin_pods.map { |p|
-    symlink = File.join('.symlinks', 'plugins', p[:name])
-    File.symlink(p[:path], symlink)
-    pod p[:name], :path => File.join(symlink, 'ios')
-  }
 end
 
 post_install do |installer|

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 typedef Widget WeekdayWidgetBuilder(int weekday);
 
-class WeekdayRow extends StatelessWidget {
-  WeekdayRow(
+class CalendarWeekday extends StatelessWidget {
+  CalendarWeekday(
     this.firstDayOfWeek, 
     { this.builder }
   ): assert(firstDayOfWeek >=0 && firstDayOfWeek <= 7);
