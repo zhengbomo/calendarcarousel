@@ -11,9 +11,12 @@ typedef Widget DayWidgetBuilder(DateTime date, bool isLastMonthDay, bool isNextM
 typedef Widget WeekdayWidgetBuilder(int weekday);
 typedef Widget CalendarHeaderWidgetBuilder(CalendarController controller, DateFormat dateFormat, DateTime dateTime);
 
+typedef void ChangeIsMinimal(bool isminimal, DateTime dateTime);
+
 class CalendarCarousel extends StatefulWidget {
   final int year;
   final int month;
+  final int day;
   final int firstDayOfWeek;
   final DateFormat dateFormat;
   final CalendarController controller;
@@ -31,6 +34,7 @@ class CalendarCarousel extends StatefulWidget {
     DayWidgetBuilder dayWidgetBuilder, 
     WeekdayWidgetBuilder weekdayWidgetBuilder,
     CalendarController controller,
+    this.day = 1,
     @required this.dateFormat
   }) : 
     this.firstDayOfWeek = firstDayOfWeek ?? 7,
@@ -69,21 +73,31 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   // aspectRatio for monthView
   double _aspectRatio = 1;
   int _currentIndex = 0;
+
+  // DateTime _currentDate2;
   
   @override
   void initState() {
-    _currentIndex = widget.controller._getIndexOfDate(widget.year, widget.month);
+    widget.controller._changeIsMinimal = _changeIsMinimal;
+    widget.controller._firstDayOfWeek = widget.firstDayOfWeek;
 
+    if (widget.controller.isMinimal) {
+      _currentIndex = widget.controller._getWeekIndexOfDate(DateTime(widget.year, widget.month, widget.day));     
+      _aspectRatio = 7.0 / 1; 
+    } else {
+      _currentIndex = widget.controller._getIndexOfDate(widget.year, widget.month);
+      var rowCount = _getRowCount(widget.year, widget.month);
+      _aspectRatio = 7.0 / rowCount; 
+    }
     _pageController = PageController(
       viewportFraction: 1,
       initialPage: _currentIndex,
       keepPage: false,
     );
 
-    var rowCount = _getRowCount(widget.year, widget.month);
-    _aspectRatio = 7.0 / rowCount; 
-    
     widget.controller._pageController = _pageController;
+    widget.controller._setCurrentDate(DateTime(widget.year, widget.month, widget.day));
+    
     super.initState();
   }
 
@@ -96,16 +110,46 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
         _createPageView()
       ],
     );
-  } 
+  }
+
+  _changeIsMinimal(bool isMinimal, DateTime dateTime) {
+    var date = dateTime ?? widget.controller.currentDate;
+    widget.controller._setIsMinimal(isMinimal);
+
+    double aspectRatio = 1;
+    if (isMinimal) {
+      aspectRatio = 7.0 / 1;
+      var currentPage = widget.controller._getWeekIndexOfDate(date);
+      _pageController.jumpToPage(currentPage);      
+    } else {
+      var rowCount = _getRowCount(date.year, date.month);
+      aspectRatio = 7.0 / rowCount;
+      var currentPage = widget.controller._getIndexOfDate(date.year, date.month);
+      _pageController.jumpToPage(currentPage);
+    }
+    
+    setState(() {
+      _aspectRatio = aspectRatio;
+    });
+  }
 
   _pageChanged(int index) {
-    var date = this._getActualDate(index);
-    var rowCount = _getRowCount(date.year, date.month);
-    setState(() {
-      _aspectRatio = 7.0 / rowCount; 
-    });
-    _currentIndex = index;
-    widget.controller._setCurrentDate(date);
+    if (widget.controller.isMinimal) {
+      var date = this._getActualDate(index);
+      widget.controller._setCurrentDate(date);
+      setState(() {
+        
+      });
+      _currentIndex = index;
+    } else {
+      var date = this._getActualDate(index);
+      var rowCount = _getRowCount(date.year, date.month);
+      setState(() {
+        _aspectRatio = 7.0 / rowCount; 
+      });
+      _currentIndex = index;
+      widget.controller._setCurrentDate(date);
+    }    
   }
 
   int _getRowCount(int year, int month) {
@@ -130,17 +174,46 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   Widget _createPageView() {
     return AnimatedAspectRatio(
       aspectRatio: _aspectRatio, 
-      duration: Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
       child: PageView.builder(
         onPageChanged: _pageChanged,
         controller: _pageController,
         itemBuilder:(BuildContext context,int index) {
-          var date = this._getActualDate(index);
-          return _createMonthView(date.year, date.month);
+          if (widget.controller.isMinimal) {
+            var date = this._getActualDate(index);
+            return _createWeekRawView(date);
+          } else {
+            var date = this._getActualDate(index);
+            return _createMonthView(date.year, date.month);
+          }
+          
         },
         scrollDirection: Axis.horizontal,
       )
+    );
+  }
+
+  Widget _createWeekRawView(DateTime currentDate) {
+    return Container(
+      width: double.infinity,
+      child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
+        crossAxisCount: 7,
+        childAspectRatio: 1,
+        children: List.generate(7, (index) {
+          // 左边的日期个数
+          var leftCount = (currentDate.weekday % 7) - (widget.firstDayOfWeek % 7);
+
+          var date = currentDate.add(Duration(days: index - leftCount));
+
+          // last month day
+          var isLastMonthDay = date.month < currentDate.month;
+          // next month day
+          var isNextMonthDay = date.month > currentDate.month;
+          return widget.dayWidgetBuilder(date, isLastMonthDay, isNextMonthDay);
+        }),
+      ),
     );
   }
 
@@ -185,23 +258,38 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
   /// get actual month for PageView index
   DateTime _getActualDate(int index) {
-    var now = DateTime.now();
-    return DateTime(now.year, now.month - (_kTodayIndex - index));
+    if (widget.controller.isMinimal) {
+      var now = DateTime.now();
+      return now.add(Duration(days: 7 * (index - _kTodayIndex)));
+    } else {
+      var now = DateTime.now();
+      return DateTime(now.year, now.month - (_kTodayIndex - index));
+    }    
   }
 }
 
 
 class CalendarController extends ChangeNotifier {
+  int _firstDayOfWeek;
+  ChangeIsMinimal _changeIsMinimal;
   PageController _pageController;
-  DateTime _currentDate;
 
+  bool _isMinimal = false;
+  bool get isMinimal => _isMinimal;
+  _setIsMinimal(bool isminimal) {
+    _isMinimal = isminimal;
+  }
+
+  DateTime _currentDate;
   DateTime get currentDate => _currentDate;
   _setCurrentDate(DateTime dateTime) {
     _currentDate = dateTime;
     notifyListeners();
   }
 
-  /// scroll to next month
+  CalendarController({bool isMinimal = false}): _isMinimal = isMinimal;
+
+  /// scroll to next month / week
   /// 
   /// it will do animate while duration is not null 
   nextPage({ 
@@ -218,7 +306,7 @@ class CalendarController extends ChangeNotifier {
     }    
   }
 
-  /// scroll to previous month
+  /// scroll to previous month / week
   /// 
   /// it will do animate while duration is not null 
   previousPage({
@@ -243,19 +331,24 @@ class CalendarController extends ChangeNotifier {
     Curve curve = Curves.bounceInOut 
   }) {
     var now = DateTime.now();
-    goToMonth(year: now.year, month: now.month, duration: duration, curve: curve);
+    goToDate(dateTime: now, duration: duration, curve: curve);
   }
 
-  /// scroll to special month
+  /// scroll to special day in month / week
   /// 
   /// it will do animate while duration is not null 
-  goToMonth({
-    @required int year, 
-    @required int month,
+  goToDate({
+    @required DateTime dateTime,
     Duration duration,
     Curve curve = Curves.bounceInOut 
   }) {
-    var index = _getIndexOfDate(year, month);
+    int index;
+    if (isMinimal) {
+      index = _getWeekIndexOfDate(dateTime);
+    } else {
+      index = _getIndexOfDate(dateTime.year, dateTime.month);
+    }
+    
     if (duration != null) {
       _pageController.animateToPage(
         index, 
@@ -267,10 +360,26 @@ class CalendarController extends ChangeNotifier {
     }
   }
 
+  /// expand/collapse month view
+  changeIsMinimal(bool isMinimal, DateTime dateTime) {
+    if (_changeIsMinimal != null) {
+      _changeIsMinimal(isMinimal, dateTime);
+    }
+  }
+
   /// get page index of month
   int _getIndexOfDate(int year, int month) {
     var now = DateTime.now();
     var monthSpan = (year - now.year) * 12 + (month - now.month);
     return _kTodayIndex + monthSpan;
+  }
+
+   /// get week row page index
+  int _getWeekIndexOfDate(DateTime dateTime) {
+    var now = DateTime.now();
+    var nowFirstDate = now.add(Duration(days: -((now.weekday - (_firstDayOfWeek % 7)) % 7))); 
+
+    var pageSpan = dateTime.difference(nowFirstDate).inDays / 7;
+    return _IntegerHalfMax + pageSpan.floor();
   }
 }

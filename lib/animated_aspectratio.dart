@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
   AnimatedAspectRatio({
     Key key,
-    @required this.aspectRatio,
-    this.child,
     Curve curve = Curves.linear,
     @required Duration duration,
+    @required this.child,
+    @required this.aspectRatio,
   }) : assert(aspectRatio != null),
        assert(aspectRatio.isFinite),
        super(key: key, curve: curve, duration: duration);

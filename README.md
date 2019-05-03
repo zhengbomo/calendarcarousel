@@ -20,6 +20,7 @@ A lightweight and highly customizable calendar view for your Flutter app.
 * Vertical autosizing
 * Animation with height
 * Month change handling
+* expand/collapse month view
 
 ## Example
 
@@ -38,18 +39,21 @@ void main() {
 define `CalendarController` if you want to operate the calendar
 
 ```dart
-CalendarController _calendarController = CalendarController();
+// minimalMode will show only one week row
+CalendarController _calendarController = CalendarController(isMinimal: false);
 var dateFormat = DateFormat.yMMM("en");
 
 CalendarCarousel(
+  firstDayOfWeek: 0,
   controller: _calendarController,
   dateFormat: dateFormat,
   year: 2019,
   month: 5,
+  day: 20,
   headerWidgetBuilder: (controller, dateFormat, dateTime) {
     // customize header
     return CalendarDefaultHeader(
-      calendarController: controller, 
+      calendarController: controller,
       dateTime: dateTime,
       dateFormat: dateFormat,
     );
@@ -95,13 +99,15 @@ opeartion for calendar
 // animate to today
 _calendarController.goToToday(duration: const Duration(milliseconds: 450));
 
-// jump to month without animation
-_calendarController.goToMonth(year: 2015, month: 9);
+// jump to special datetime without animation
+_calendarController.goToDate(dateTime: DateTime(2015, 9, 20), duration: null);
+
+// jump to special month without animation
+_calendarController.goToDate(dateTime: DateTime(2015, 9, 1), duration: null);
 
 // animate to month
-_calendarController.goToMonth(
-  year: 2018,
-  month: 1,
+_calendarController.goToDate(
+  dateTime: DateTime(2018, 9, 1)
   duration: const Duration(milliseconds: 450),
   curve: Curves.bounceIn
 );
@@ -109,6 +115,15 @@ _calendarController.goToMonth(
 // get current month
 var date = _calendarController.currentDate;
 print("${date.year}-${date.month}");
+
+// expand calendar
+_calendarController.changeIsMinimal(false, null);
+
+// collapse calendar
+_calendarController.changeIsMinimal(true, null);
+
+// collapse calendar with special datetime
+_calendarController.changeIsMinimal(true, DateTime(2019, 5, 4));
 ```
 
 listen calendar's month changed

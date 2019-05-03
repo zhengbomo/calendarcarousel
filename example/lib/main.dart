@@ -21,7 +21,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  CalendarController _calendarController = CalendarController();
+  CalendarController _calendarController = CalendarController(isMinimal: false);
   @override
   void initState() {
     super.initState();
@@ -34,8 +34,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var dateFormat = DateFormat.yMMM(_kDateFormatLanguageCode);
-    var initYear = 2019;
-    var initMonth = 3;
+    const initYear = 2019;
+    const initMonth = 3;
+    const initDay = 23;
 
     return MaterialApp(
       home: Scaffold(
@@ -45,11 +46,12 @@ class _MyAppState extends State<MyApp> {
         body: ListView(
           children: <Widget>[
             CalendarCarousel(
-              firstDayOfWeek: 1,
+              firstDayOfWeek: 0,
               controller: _calendarController,
               dateFormat: dateFormat,
               year: initYear,
               month: initMonth,
+              day: initDay,
               headerWidgetBuilder: (controller, dateFormat, dateTime) {
                 return CalendarDefaultHeader(
                   calendarController: controller, 
@@ -58,10 +60,14 @@ class _MyAppState extends State<MyApp> {
                 );
               },
               weekdayWidgetBuilder: (weekday) {
-                return CalendarDefaultWeekday(weekday: weekday, dateFormat: dateFormat, textStyle: TextStyle(
-                  fontSize: 16,
-                  color: Colors.red
-                ));
+                return CalendarDefaultWeekday(
+                  weekday: weekday, 
+                  dateFormat: dateFormat,
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    color: Colors.red
+                  )
+                );
               },
               dayWidgetBuilder: (date, isLastMonthDay, isNextMontyDay) {
                 var today = DateTime.now();
@@ -74,7 +80,7 @@ class _MyAppState extends State<MyApp> {
                     color: isToday ? Colors.blueAccent : Colors.green,
                     textColor: (isLastMonthDay || isNextMontyDay) ? Colors.black : Colors.white,
                     onPressed: (isLastMonthDay || isNextMontyDay) ? null : () {
-
+                      print("$date");
                     },
                     child: Text(
                       isToday ? "Today" : "${date.day}", 
@@ -99,15 +105,25 @@ class _MyAppState extends State<MyApp> {
             ),
             RaisedButton(
               onPressed: () {
-                _calendarController.goToMonth(year: 2012, month: 9, duration: null);
+                _calendarController.goToDate(dateTime: DateTime(2015, 9, 20), duration: null);
               },
-              child: Text("jump to 2012-09"),
+              child: Text("jump to 2015-09-20"),
             ),
             RaisedButton(
               onPressed: () {
-                _calendarController.goToMonth(year: 2018, month: 1, duration: const Duration(milliseconds: 250), curve: Curves.bounceIn);
+                _calendarController.goToDate(dateTime: DateTime(2018, 1, 1), duration: const Duration(milliseconds: 250), curve: Curves.bounceIn);
               },
-              child: Text("animate to 2018-01"),
+              child: Text("animate to 2018-01-01"),
+            ),
+            RaisedButton(
+              onPressed: () {
+                // _calendarController.changeIsMinimal(!_calendarController.isMinimal, DateTime(2019, 12, 24));
+                _calendarController.changeIsMinimal(!_calendarController.isMinimal, null);
+                setState(() {
+                  // update text
+                });
+              },
+              child: Text(_calendarController.isMinimal ? "expand" : "collapse"),
             ),
             Builder(
               builder: (context) {
