@@ -85,7 +85,7 @@ opeartion for calendar
 
 ```dart
 // animate to today
-_calendarController.goToToday(duration: const Duration(milliseconds: 250));
+_calendarController.goToToday(duration: const Duration(milliseconds: 450));
 
 // jump to month without animation
 _calendarController.goToMonth(year: 2015, month: 9);
@@ -94,12 +94,12 @@ _calendarController.goToMonth(year: 2015, month: 9);
 _calendarController.goToMonth(
   year: 2018,
   month: 1,
-  duration: const Duration(milliseconds: 250),
+  duration: const Duration(milliseconds: 450),
   curve: Curves.bounceIn
 );
 
 // get current month
-var date = _calendarController.getCurrentMonth();
+var date = _calendarController.currentDate;
 print("${date.year}-${date.month}");
 ```
 
