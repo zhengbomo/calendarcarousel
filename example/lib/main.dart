@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var dateFormat = DateFormat.yMMM(_kDateFormatLanguageCode);
     var initYear = 2019;
-    var initMonth = 2;
+    var initMonth = 3;
 
     return MaterialApp(
       home: Scaffold(
@@ -45,6 +45,7 @@ class _MyAppState extends State<MyApp> {
         body: ListView(
           children: <Widget>[
             CalendarCarousel(
+              firstDayOfWeek: 1,
               controller: _calendarController,
               dateFormat: dateFormat,
               year: initYear,
@@ -105,7 +106,7 @@ class _MyAppState extends State<MyApp> {
               builder: (context) {
                 return RaisedButton(
                   onPressed: () {
-                    var date = _calendarController.getCurrentMonth();
+                    var date = _calendarController.currentDate;
                     var snakBar = SnackBar(
                       content: Text("${date.year}-${date.month}"), 
                     );
