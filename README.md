@@ -9,6 +9,8 @@ A lightweight and highly customizable calendar view for your Flutter app.
 
 ![demo演示](https://github.com/zhengbomo/calendarcarousel/blob/master/images/demo.gif?raw=true)
 
+![demo演示](https://github.com/zhengbomo/calendarcarousel/blob/master/images/demo.jpg?raw=true)
+
 ## Feature
 
 * Extensive, yet easy to use API
@@ -16,7 +18,7 @@ A lightweight and highly customizable calendar view for your Flutter app.
 * Locale support
 * Vertical autosizing
 * Animation with height
-* Gesture handling
+* Month change handling
 
 ## Example
 
@@ -84,7 +86,7 @@ opeartion for calendar
 // animate to today
 _calendarController.goToToday(duration: const Duration(milliseconds: 250));
 
-// jump to month
+// jump to month without animation
 _calendarController.goToMonth(year: 2015, month: 9);
 
 // animate to month
@@ -115,6 +117,6 @@ This project is a starting point for a Flutter
 a specialized package that includes platform-specific implementation code for
 Android and/or iOS.
 
-For help getting started with Flutter, view our 
+For help getting started with Flutter, view our
 [online documentation](https://flutter.io/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
