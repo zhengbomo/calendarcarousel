@@ -71,17 +71,14 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
     
     // last month day count 
     var firstWeekDay = DateTime(widget.year, widget.month, 1).weekday % 7;
-    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
+    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
     var thisMonthDayCount = DateTime(widget.year, widget.month + 1, 0).day;
 
     /// 行数
-    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
-    setState(() {
-      _aspectRatio = 7.0 / rowCount; 
-    });
-
+    var rowCount = ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
+    _aspectRatio = 7.0 / rowCount; 
+    
     widget.controller._pageController = _pageController;
-
     super.initState();
   }
 
@@ -103,14 +100,12 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   _pageChanged(int index) {
     var date = this._getActualDate(index);
     var firstWeekDay = DateTime(date.year, date.month, 1).weekday % 7;
-    
-    var lastMonthDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
-    print("$firstWeekDay, $lastMonthDayCount");
 
+    var lastMonthRestDayCount = (firstWeekDay - (widget.firstDayOfWeek % 7)) % 7;
     var thisMonthDayCount = DateTime(date.year, date.month + 1, 0).day;
 
     /// 行数
-    var rowCount = ((thisMonthDayCount + lastMonthDayCount) / 7.0).ceil();
+    var rowCount = ((thisMonthDayCount + lastMonthRestDayCount) / 7.0).ceil();
     setState(() {
       _aspectRatio = 7.0 / rowCount; 
     });
@@ -180,6 +175,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
     );
   }
 
+  /// get actual month for PageView index
   DateTime _getActualDate(int index) {
     var now = DateTime.now();
     return DateTime(now.year, now.month - (_kTodayIndex - index));
