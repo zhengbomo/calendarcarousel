@@ -18,6 +18,7 @@ class CalendarCarousel extends StatefulWidget {
   final int month;
   final int day;
   final int firstDayOfWeek;
+  final double childAspectRatio;
   final DateFormat dateFormat;
   final CalendarController controller;
   
@@ -35,6 +36,7 @@ class CalendarCarousel extends StatefulWidget {
     WeekdayWidgetBuilder weekdayWidgetBuilder,
     CalendarController controller,
     this.day = 1,
+    this.childAspectRatio = 1,
     @required this.dateFormat
   }) : 
     this.firstDayOfWeek = firstDayOfWeek ?? 7,
@@ -83,11 +85,11 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
     if (widget.controller.isMinimal) {
       _currentIndex = widget.controller._getWeekIndexOfDate(DateTime(widget.year, widget.month, widget.day));     
-      _aspectRatio = 7.0 / 1; 
+      _aspectRatio = 7.0 / 1 * widget.childAspectRatio; 
     } else {
       _currentIndex = widget.controller._getIndexOfDate(widget.year, widget.month);
       var rowCount = _getRowCount(widget.year, widget.month);
-      _aspectRatio = 7.0 / rowCount; 
+      _aspectRatio = 7.0 / rowCount * widget.childAspectRatio; 
     }
     _pageController = PageController(
       viewportFraction: 1,
@@ -118,12 +120,12 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
     double aspectRatio = 1;
     if (isMinimal) {
-      aspectRatio = 7.0 / 1;
+      aspectRatio = 7.0 / 1 * widget.childAspectRatio;
       var currentPage = widget.controller._getWeekIndexOfDate(date);
       _pageController.jumpToPage(currentPage);      
     } else {
       var rowCount = _getRowCount(date.year, date.month);
-      aspectRatio = 7.0 / rowCount;
+      aspectRatio = 7.0 / rowCount * widget.childAspectRatio;
       var currentPage = widget.controller._getIndexOfDate(date.year, date.month);
       _pageController.jumpToPage(currentPage);
     }
@@ -145,7 +147,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
       var date = this._getActualDate(index);
       var rowCount = _getRowCount(date.year, date.month);
       setState(() {
-        _aspectRatio = 7.0 / rowCount; 
+        _aspectRatio = 7.0 / rowCount * widget.childAspectRatio; 
       });
       _currentIndex = index;
       widget.controller._setCurrentDate(date);
@@ -200,7 +202,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
       child: GridView.count(
         physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 7,
-        childAspectRatio: 1,
+        childAspectRatio: widget.childAspectRatio,
         children: List.generate(7, (index) {
           // 左边的日期个数
           var leftCount = (currentDate.weekday % 7) - (widget.firstDayOfWeek % 7);
@@ -231,7 +233,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
       child: GridView.count(
         physics: NeverScrollableScrollPhysics(),
         crossAxisCount: 7,
-        childAspectRatio: 1,
+        childAspectRatio: widget.childAspectRatio,
         children: List.generate(rowCount * 7, (index) {
           var currentDay = index + 1 - lastMonthRestDayCount;
           // last month day

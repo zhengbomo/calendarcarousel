@@ -1,3 +1,7 @@
+## 0.0.6
+
+* add childAspectRatio property
+
 ## 0.0.5
 
 * add expand/collapse operation for CalendarController

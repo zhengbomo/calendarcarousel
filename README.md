@@ -68,7 +68,7 @@ CalendarCarousel(
       )
     );
   },  
-  dayWidgetBuilder: (date, isLastMonthDay, isNextMontyDay) {
+  dayWidgetBuilder: (date, isLastMonthDay, isNextMonthDay) {
     // customize the day widget in month widget
     var today = DateTime.now();
     var isToday = today.year == date.year && today.month == date.month && today.day == date.day;
@@ -78,8 +78,8 @@ CalendarCarousel(
         padding: EdgeInsets.all(0),
         shape: CircleBorder(side: BorderSide(width: 1, color: Colors.black12)),
         color: isToday ? Colors.blueAccent : Colors.green,
-        textColor: (isLastMonthDay || isNextMontyDay) ? Colors.black : Colors.white,
-        onPressed: (isLastMonthDay || isNextMontyDay) ? null : () {
+        textColor: (isLastMonthDay || isNextMonthDay) ? Colors.black : Colors.white,
+        onPressed: (isLastMonthDay || isNextMonthDay) ? null : () {
           print("$date");
         },
         child: Text(

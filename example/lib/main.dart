@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
           children: <Widget>[
             CalendarCarousel(
               firstDayOfWeek: 0,
+              childAspectRatio: 1.5,
               controller: _calendarController,
               dateFormat: dateFormat,
               year: initYear,
