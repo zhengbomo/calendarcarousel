@@ -1,7 +1,6 @@
 # calendar_carousel
 
 [![Pub Package](https://img.shields.io/pub/v/calendar_carousel.svg?style=flat-square)](https://pub.dartlang.org/packages/calendar_carousel)
-[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-52bdeb.svg?longCache=true&style=flat-square)](https://github.com/Solido/awesome-flutter)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 A lightweight and highly customizable calendar view for your Flutter app.
