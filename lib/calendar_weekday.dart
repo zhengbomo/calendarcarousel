@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 typedef Widget WeekdayWidgetBuilder(int weekday);
 
 class CalendarWeekday extends StatelessWidget {
-  CalendarWeekday(
-    this.firstDayOfWeek, 
-    { this.builder }
-  ): assert(firstDayOfWeek >=0 && firstDayOfWeek <= 7);
+  CalendarWeekday({
+        Key? key,
+        required this.firstDayOfWeek,
+        required this.builder}
+      ):
+        assert(firstDayOfWeek >=0 && firstDayOfWeek <= 7),
+        super(key: key);
 
   final int firstDayOfWeek;
   final WeekdayWidgetBuilder builder;

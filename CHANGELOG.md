@@ -1,5 +1,9 @@
 ## 0.0.7-nullsafety.2
 
+* fix version bug
+
+## 0.0.7-nullsafety.1
+
 * null safety
 
 ## 0.0.7
