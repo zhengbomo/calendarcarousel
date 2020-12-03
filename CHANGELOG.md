@@ -1,3 +1,6 @@
+## 0.0.7-nullsafety.2
+
+* null safety
 
 ## 0.0.7
 
