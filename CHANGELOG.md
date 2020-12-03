@@ -1,3 +1,8 @@
+
+## 0.0.7
+
+* optimize performance for setState
+
 ## 0.0.6
 
 * add childAspectRatio property
