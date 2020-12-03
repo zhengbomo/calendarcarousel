@@ -131,10 +131,10 @@ class _MyAppState extends State<MyApp> {
                 return RaisedButton(
                   onPressed: () {
                     var date = _calendarController.currentDate;
-                    var snakBar = SnackBar(
+                    final snackBar = SnackBar(
                       content: Text("${date.year}-${date.month}"), 
                     );
-                    Scaffold.of(context).showSnackBar(snakBar);
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   },
                   child: Text("show current month"),
                 );

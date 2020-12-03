@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/calendar_carousel.iml" filepath="$PROJECT_DIR$/calendar_carousel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android/calendar_carousel_android.iml" filepath="$PROJECT_DIR$/android/calendar_carousel_android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/android/calendar_carousel_example_android.iml" filepath="$PROJECT_DIR$/example/android/calendar_carousel_example_android.iml" />
     </modules>
   </component>
 </project>

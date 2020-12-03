@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/material.dart';
+import 'package:stateful_builder_controller/stateful_builder_controller.dart';
 import './calendar_weekday.dart';
 import './animated_aspectratio.dart';
 import './calendar_default_widget.dart';
@@ -74,9 +75,11 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
   // aspectRatio for monthView
   double _aspectRatio = 1;
-  int _currentIndex = 0;
 
-  // DateTime _currentDate2;
+  final _aspectRatioUpdateController = SetterController();
+  final _headerUpdateController = SetterController();
+
+  int _currentIndex = 0;
   
   @override
   void initState() {
@@ -130,25 +133,30 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
       _pageController.jumpToPage(currentPage);
     }
     
-    setState(() {
-      _aspectRatio = aspectRatio;
-    });
+    if (_aspectRatio != aspectRatio) {
+      _aspectRatioUpdateController.update(() {
+        _aspectRatio = aspectRatio;
+      });
+    }
   }
 
   _pageChanged(int index) {
+    // update header
+    _headerUpdateController.update(() { });
+    
     if (widget.controller.isMinimal) {
       var date = this._getActualDate(index);
       widget.controller._setCurrentDate(date);
-      setState(() {
-        
-      });
       _currentIndex = index;
     } else {
       var date = this._getActualDate(index);
       var rowCount = _getRowCount(date.year, date.month);
-      setState(() {
-        _aspectRatio = 7.0 / rowCount * widget.childAspectRatio; 
-      });
+      double aspectRatio = 7.0 / rowCount * widget.childAspectRatio;
+      if (_aspectRatio != aspectRatio) {
+        _aspectRatioUpdateController.update(() {
+          _aspectRatio = aspectRatio;
+        });
+      }
       _currentIndex = index;
       widget.controller._setCurrentDate(date);
     }    
@@ -164,7 +172,12 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   }
 
   Widget _createHeaderView() {
-    return widget.headerWidgetBuilder(widget.controller, widget.dateFormat, _getActualDate(_currentIndex));
+    return StatefulBuilder1(
+      builder: (context, setter, _) {
+        return widget.headerWidgetBuilder(widget.controller, widget.dateFormat, _getActualDate(_currentIndex));
+      },
+      controller: _headerUpdateController
+    );
   }
 
   Widget _createWeekView() {
@@ -174,11 +187,17 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   }
 
   Widget _createPageView() {
-    return AnimatedAspectRatio(
-      aspectRatio: _aspectRatio, 
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-      child: PageView.builder(
+    return StatefulBuilder1<Widget>(
+      builder: (context, setter, value) {
+        return AnimatedAspectRatio(
+          aspectRatio: _aspectRatio,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          child: value
+        );
+      },
+      controller: _aspectRatioUpdateController,
+      value: PageView.builder(
         onPageChanged: _pageChanged,
         controller: _pageController,
         itemBuilder:(BuildContext context,int index) {
