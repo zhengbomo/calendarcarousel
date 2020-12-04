@@ -12,7 +12,7 @@ typedef Widget DayWidgetBuilder(DateTime date, bool isLastMonthDay, bool isNextM
 typedef Widget WeekdayWidgetBuilder(int weekday);
 typedef Widget CalendarHeaderWidgetBuilder(CalendarController controller, DateFormat dateFormat, DateTime dateTime);
 
-typedef void ChangeIsMinimal(bool isminimal, DateTime dateTime);
+typedef void ChangeIsMinimal(bool isminimal, DateTime? dateTime);
 
 class CalendarCarousel extends StatefulWidget {
   final int year;
@@ -28,41 +28,43 @@ class CalendarCarousel extends StatefulWidget {
   final WeekdayWidgetBuilder weekdayWidgetBuilder;
 
   CalendarCarousel({
-    Key key,
-    int year,
-    int month,
-    int firstDayOfWeek,
-    CalendarHeaderWidgetBuilder headerWidgetBuilder,
-    DayWidgetBuilder dayWidgetBuilder, 
-    WeekdayWidgetBuilder weekdayWidgetBuilder,
-    CalendarController controller,
+    Key? key,
+    int? year,
+    int? month,
+    int? firstDayOfWeek,
+    CalendarHeaderWidgetBuilder? headerWidgetBuilder,
+    DayWidgetBuilder? dayWidgetBuilder,
+    WeekdayWidgetBuilder? weekdayWidgetBuilder,
+    CalendarController? controller,
     this.day = 1,
     this.childAspectRatio = 1,
-    @required this.dateFormat
-  }) : 
+    required this.dateFormat
+  }) :
     this.firstDayOfWeek = firstDayOfWeek ?? 7,
     this.year = year ?? DateTime.now().year,
     this.month = month ?? DateTime.now().month,
     this.controller = controller ?? CalendarController(),
-    this.headerWidgetBuilder = headerWidgetBuilder ?? 
+    this.headerWidgetBuilder = headerWidgetBuilder ??
       ((controller, dateFormat, dateTime) {
         return CalendarDefaultHeader(
-          calendarController: controller, 
+          calendarController: controller,
           dateTime: dateTime,
           dateFormat: dateFormat,
         );
       }),
-    this.dayWidgetBuilder = dayWidgetBuilder ?? 
+    this.dayWidgetBuilder = dayWidgetBuilder ??
       ((DateTime date, bool isLastMonthDay, bool isNextMonthDay) {
         return CalendarDefaultDay(
-          dateTime: date, 
-          isLastMonthDay: isLastMonthDay, 
+          dateTime: date,
+          isLastMonthDay: isLastMonthDay,
           isNextMonthDay: isNextMonthDay
         );
       }),
-      this.weekdayWidgetBuilder = weekdayWidgetBuilder ?? 
+      this.weekdayWidgetBuilder = weekdayWidgetBuilder ??
         ((int weekday) {
           return CalendarDefaultWeekday(weekday: weekday, dateFormat: dateFormat);
+          // return CalendarDefaultWeekday(weekday: weekday, dateFormat: dateFormat);
+
         }),
       super(key: key);
 
@@ -71,7 +73,7 @@ class CalendarCarousel extends StatefulWidget {
 }
 
 class _CalendarCarouselState extends State<CalendarCarousel> with TickerProviderStateMixin  {
-  PageController _pageController;
+  PageController? _pageController;
 
   // aspectRatio for monthView
   double _aspectRatio = 1;
@@ -117,7 +119,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
     );
   }
 
-  _changeIsMinimal(bool isMinimal, DateTime dateTime) {
+  _changeIsMinimal(bool isMinimal, DateTime? dateTime) {
     var date = dateTime ?? widget.controller.currentDate;
     widget.controller._setIsMinimal(isMinimal);
 
@@ -125,12 +127,12 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
     if (isMinimal) {
       aspectRatio = 7.0 / 1 * widget.childAspectRatio;
       var currentPage = widget.controller._getWeekIndexOfDate(date);
-      _pageController.jumpToPage(currentPage);      
+      _pageController!.jumpToPage(currentPage);
     } else {
       var rowCount = _getRowCount(date.year, date.month);
       aspectRatio = 7.0 / rowCount * widget.childAspectRatio;
       var currentPage = widget.controller._getIndexOfDate(date.year, date.month);
-      _pageController.jumpToPage(currentPage);
+      _pageController!.jumpToPage(currentPage);
     }
     
     if (_aspectRatio != aspectRatio) {
@@ -181,7 +183,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
   }
 
   Widget _createWeekView() {
-    return CalendarWeekday(widget.firstDayOfWeek, builder: (weekday) {
+    return CalendarWeekday(firstDayOfWeek: widget.firstDayOfWeek, builder: (weekday) {
       return widget.weekdayWidgetBuilder(weekday);
     });
   }
@@ -193,7 +195,7 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
           aspectRatio: _aspectRatio,
           duration: Duration(milliseconds: 300),
           curve: Curves.easeOut,
-          child: value
+          child: value!
         );
       },
       controller: _aspectRatioUpdateController,
@@ -292,8 +294,8 @@ class _CalendarCarouselState extends State<CalendarCarousel> with TickerProvider
 
 class CalendarController extends ChangeNotifier {
   int _firstDayOfWeek;
-  ChangeIsMinimal _changeIsMinimal;
-  PageController _pageController;
+  ChangeIsMinimal? _changeIsMinimal;
+  PageController? _pageController;
 
   bool _isMinimal = false;
   bool get isMinimal => _isMinimal;
@@ -308,39 +310,46 @@ class CalendarController extends ChangeNotifier {
     notifyListeners();
   }
 
-  CalendarController({bool isMinimal = false}): _isMinimal = isMinimal;
+  CalendarController({
+    Key? key,
+    int firstDayOfWeek = 0,
+    DateTime? currentDate,
+    bool isMinimal = false
+  }): _isMinimal = isMinimal,
+    _firstDayOfWeek = firstDayOfWeek,
+    _currentDate = DateTime.now();
 
   /// scroll to next month / week
   /// 
   /// it will do animate while duration is not null 
   nextPage({ 
-    Duration duration,
+    Duration? duration,
     Curve curve = Curves.bounceInOut 
   }) {
     if (duration != null) {
-      _pageController.nextPage(
-        duration: duration, 
-        curve: curve
+      _pageController!.nextPage(
+          duration: duration,
+          curve: curve
       );
     } else {
-      _pageController.jumpToPage((_pageController.page + 1).toInt());
-    }    
+      _pageController!.jumpToPage((_pageController!.page! + 1).toInt());
+    }
   }
 
   /// scroll to previous month / week
   /// 
   /// it will do animate while duration is not null 
   previousPage({
-    Duration duration,
+    Duration? duration,
     Curve curve = Curves.bounceInOut 
   }) {
     if (duration != null) {
-      _pageController.previousPage(
+      _pageController!.previousPage(
         duration: duration, 
         curve: curve
       );
     } else {
-      _pageController.jumpToPage((_pageController.page - 1).toInt());
+      _pageController!.jumpToPage((_pageController!.page! - 1).toInt());
     }    
   }
 
@@ -348,7 +357,7 @@ class CalendarController extends ChangeNotifier {
   /// 
   /// it will do animate while duration is not null 
   goToToday({
-    Duration duration,
+    Duration? duration,
     Curve curve = Curves.bounceInOut 
   }) {
     var now = DateTime.now();
@@ -359,8 +368,8 @@ class CalendarController extends ChangeNotifier {
   /// 
   /// it will do animate while duration is not null 
   goToDate({
-    @required DateTime dateTime,
-    Duration duration,
+    required DateTime dateTime,
+    Duration? duration,
     Curve curve = Curves.bounceInOut 
   }) {
     int index;
@@ -371,20 +380,20 @@ class CalendarController extends ChangeNotifier {
     }
     
     if (duration != null) {
-      _pageController.animateToPage(
+      _pageController!.animateToPage(
         index, 
         duration: duration, 
         curve: curve
       );
     } else {
-      _pageController.jumpToPage(index);
+      _pageController!.jumpToPage(index);
     }
   }
 
   /// expand/collapse month view
-  changeIsMinimal(bool isMinimal, DateTime dateTime) {
+  changeIsMinimal(bool isMinimal, DateTime? dateTime) {
     if (_changeIsMinimal != null) {
-      _changeIsMinimal(isMinimal, dateTime);
+      _changeIsMinimal!(isMinimal, dateTime);
     }
   }
 

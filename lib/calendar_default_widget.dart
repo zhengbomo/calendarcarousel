@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import './calendar_carousel.dart' show CalendarController;
  
 class CalendarDefaultWeekday extends StatelessWidget {
+
   final int weekday;
   final DateFormat dateFormat;
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
+
   CalendarDefaultWeekday({
-    this.weekday,
-    this.dateFormat,
+    required this.weekday,
+    required this.dateFormat,
     this.textStyle
   });
 
@@ -28,10 +30,16 @@ class CalendarDefaultWeekday extends StatelessWidget {
 }
 
 class CalendarDefaultDay extends StatelessWidget {
+
   final DateTime dateTime;
   final bool isLastMonthDay;
   final bool isNextMonthDay;
-  CalendarDefaultDay({this.dateTime, this.isLastMonthDay, this.isNextMonthDay});
+
+  CalendarDefaultDay({
+    required this.dateTime,
+    required this.isLastMonthDay,
+    required this.isNextMonthDay
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +65,9 @@ class CalendarDefaultHeader extends StatelessWidget {
   final DateTime dateTime;
   final DateFormat dateFormat;
   CalendarDefaultHeader({
-    @required this.calendarController, 
-    @required this.dateTime,
-    @required this.dateFormat
+    required this.calendarController,
+    required this.dateTime,
+    required this.dateFormat
   });
 
   @override

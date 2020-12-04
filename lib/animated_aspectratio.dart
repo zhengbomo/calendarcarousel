@@ -4,13 +4,12 @@ import 'package:flutter/foundation.dart';
 
 class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
   AnimatedAspectRatio({
-    Key key,
+    Key? key,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    @required this.child,
-    @required this.aspectRatio,
-  }) : assert(aspectRatio != null),
-       assert(aspectRatio.isFinite),
+    required Duration duration,
+    required this.child,
+    required this.aspectRatio,
+  }) : assert(aspectRatio.isFinite),
        super(key: key, curve: curve, duration: duration);
   
   final double aspectRatio;
@@ -28,19 +27,17 @@ class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
 }
 
 class _AnimatedAspectRatioState extends AnimatedWidgetBaseState<AnimatedAspectRatio> {
-  Tween<double> _aspectRatio;
+  Tween<double>? _aspectRatio;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _aspectRatio = visitor(_aspectRatio, widget.aspectRatio, (dynamic value) {
-      return Tween<double>(begin: value);
-    });
-  }
+    _aspectRatio = visitor(_aspectRatio, widget.aspectRatio, (dynamic value) => Tween<double>(begin: value as double)) as Tween<double>?;
+}
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: _aspectRatio.evaluate(animation),
+      aspectRatio: _aspectRatio!.evaluate(animation!),
       child: widget.child,
     );
   }

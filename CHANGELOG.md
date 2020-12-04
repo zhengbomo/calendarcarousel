@@ -1,4 +1,8 @@
 
+## 0.1.0-nullsafety.1
+
+* null safety
+
 ## 0.0.7
 
 * optimize performance for setState
