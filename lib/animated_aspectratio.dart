@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-
 class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
   AnimatedAspectRatio({
     Key? key,
@@ -9,11 +8,11 @@ class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
     required Duration duration,
     required this.child,
     required this.aspectRatio,
-  }) : assert(aspectRatio.isFinite),
-       super(key: key, curve: curve, duration: duration);
-  
+  })   : assert(aspectRatio.isFinite),
+        super(key: key, curve: curve, duration: duration);
+
   final double aspectRatio;
-  
+
   final Widget child;
 
   @override
@@ -26,13 +25,16 @@ class AnimatedAspectRatio extends ImplicitlyAnimatedWidget {
   }
 }
 
-class _AnimatedAspectRatioState extends AnimatedWidgetBaseState<AnimatedAspectRatio> {
+class _AnimatedAspectRatioState
+    extends AnimatedWidgetBaseState<AnimatedAspectRatio> {
   Tween<double>? _aspectRatio;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _aspectRatio = visitor(_aspectRatio, widget.aspectRatio, (dynamic value) => Tween<double>(begin: value as double)) as Tween<double>?;
-}
+    _aspectRatio = visitor(_aspectRatio, widget.aspectRatio,
+            (dynamic value) => Tween<double>(begin: value as double))
+        as Tween<double>?;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,8 @@ class _AnimatedAspectRatioState extends AnimatedWidgetBaseState<AnimatedAspectRa
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description.add(DiagnosticsProperty<Tween<double>>('aspectRatio', _aspectRatio, defaultValue: null));
+    description.add(DiagnosticsProperty<Tween<double>>(
+        'aspectRatio', _aspectRatio,
+        defaultValue: null));
   }
 }
