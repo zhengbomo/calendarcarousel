@@ -1,10 +1,6 @@
-## 0.0.7-nullsafety.2
+## 0.0.8
 
-* fix version bug
-
-## 0.0.7-nullsafety.1
-
-* null safety
+* update package
 
 ## 0.0.7
 

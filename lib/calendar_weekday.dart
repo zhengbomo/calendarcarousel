@@ -3,13 +3,8 @@ import 'package:flutter/material.dart';
 typedef Widget WeekdayWidgetBuilder(int weekday);
 
 class CalendarWeekday extends StatelessWidget {
-  CalendarWeekday({
-        Key? key,
-        required this.firstDayOfWeek,
-        required this.builder}
-      ):
-        assert(firstDayOfWeek >=0 && firstDayOfWeek <= 7),
-        super(key: key);
+  CalendarWeekday(this.firstDayOfWeek, {this.builder})
+      : assert(firstDayOfWeek >= 0 && firstDayOfWeek <= 7);
 
   final int firstDayOfWeek;
   final WeekdayWidgetBuilder builder;
@@ -25,9 +20,8 @@ class CalendarWeekday extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => 
-    Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: _renderWeekDays(),
-    );
+  Widget build(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: _renderWeekDays(),
+      );
 }
