@@ -1,3 +1,6 @@
+## 0.1.0-nullsafety.2
+
+* update packages
 
 ## 0.1.0-nullsafety.1
 
