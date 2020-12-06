@@ -1,6 +1,6 @@
 name: calendar_carousel
 description: A lightweight and highly customizable calendar view for your Flutter app.
-version: 0.0.8
+version: 0.0.9
 homepage: https://github.com/zhengbomo/calendarcarousel
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.16.1
-  stateful_builder_controller: ^0.0.2
+  stateful_builder_controller: ^0.0.3
 
 
 dev_dependencies:
