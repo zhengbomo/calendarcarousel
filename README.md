@@ -9,6 +9,8 @@ A lightweight and highly customizable calendar view for your Flutter app.
 
 ![demo演示](https://github.com/zhengbomo/calendarcarousel/blob/master/images/demo.gif?raw=true)
 
+![demo演示](https://github.com/zhengbomo/calendarcarousel/blob/master/images/demo_en.gif?raw=true)
+
 ![demo演示](https://github.com/zhengbomo/calendarcarousel/blob/master/images/demo.jpg?raw=true)
 
 ## Feature
